@@ -1,0 +1,59 @@
+trigger:
+  - main # Se dispara al hacer push a main
+
+pool:
+  vmImage: 'windows-2022'
+
+stages:
+  # 1. ETAPA DE PREPARACIÓN (Subir tus archivos HTML/CSS)
+  - stage: Build
+    displayName: 'Preparar Archivos Web'
+    jobs:
+      - job: ArchiveJob
+        steps:
+          # Copia tus archivos de HTML/CSS al directorio de salida. 
+          # Nota: Si tus archivos están dentro de una carpeta (ej. "src"), cambia '.' por './src'
+          - task: CopyFiles@2
+            displayName: 'Copiar HTML y CSS'
+            inputs:
+              SourceFolder: '.' 
+              Contents: |
+                **/*.html
+                **/*.css
+                **/css/**
+                **/images/**
+                **/assets/**
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+          # Guarda los archivos en el contenedor de Azure DevOps
+          - task: PublishBuildArtifacts@1
+            displayName: 'Guardar Artefacto'
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'
+
+  # 2. ETAPA DE DESPLIEGUE (CD)
+  - stage: Deploy
+    displayName: 'Despliegue a Azure App Service'
+    dependsOn: Build
+    condition: succeeded()
+    jobs:
+      - job: DeployJob
+        steps:
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Descargar Artefacto'
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'drop'
+              downloadPath: '$(System.ArtifactsDirectory)'
+
+          # Despliega los archivos directamente a tu Azure App Service
+          - task: AzureWebApp@1
+            displayName: 'Azure-Web-App'
+            inputs:
+              azureSubscription: 'jabrielth07-PortfolioDJ'
+              appType: 'webApp'
+              appName: 'Portafolio-DJ'
+              package: '$(System.ArtifactsDirectory)/drop' # Apunta directo a la carpeta con los archivos sueltos
