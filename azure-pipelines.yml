@@ -19,7 +19,7 @@ stages:
     - task: UseDotNet@2
       inputs:
         packageType: 'sdk'
-        version: '$(dotnetVersion)'
+        version: '9.0.306'
 
     - task: DotNetCoreCLI@2
       inputs:
@@ -52,7 +52,7 @@ stages:
 
     - task: AzureWebApp@1
       inputs:
-        azureSubscription: 'jabrielth07-PortfolioDJ' # Nombre de la conexión
+        azureSubscription: 'ConectionDJ' # Nombre de la conexión
         appType: 'webApp'
         appName: 'Portafolio-DJ'    # Nombre de tu App Service
         package: '$(System.ArtifactsDirectory)/drop/*.zip'
