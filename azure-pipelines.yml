@@ -1,3 +1,4 @@
+
 trigger:
   - main # Se dispara automáticamente al hacer push a la rama main
 
@@ -5,9 +6,7 @@ pool:
   vmImage: 'windows-2022'
 
 variables:
-  proyecto: '**/*.csproj'
   buildConfiguration: 'Release'
-  dotnetVersion: '10.0.x'
 
 stages:
 # 1. ETAPA DE COMPILACIÓN (CI)
@@ -16,20 +15,17 @@ stages:
   jobs:
   - job: BuildJob
     steps:
-    - task: UseDotNet@2
+    - task: ArchiveFiles@2
+      displayName: 'Empaquetar portafolio HTML y CSS'
       inputs:
-        packageType: 'sdk'
-        version: '9.0.306'
-
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'publish'
-        publishWebProjects: true
-        projects: '$(proyecto)'
-        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-        zipAfterPublish: true
+        rootFolderOrFile: '$(Build.SourcesDirectory)'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/portafolio.zip'
+        replaceExistingArchive: true
 
     - task: PublishBuildArtifacts@1
+      displayName: 'Publicar artefactos'
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
@@ -44,6 +40,7 @@ stages:
   - job: DeployJob
     steps:
     - task: DownloadBuildArtifacts@0
+      displayName: 'Descargar artefactos'
       inputs:
         buildType: 'current'
         downloadType: 'single'
@@ -51,8 +48,9 @@ stages:
         downloadPath: '$(System.ArtifactsDirectory)'
 
     - task: AzureWebApp@1
+      displayName: 'Desplegar portafolio'
       inputs:
-        azureSubscription: 'ConectionDJ' # Nombre de la conexión
+        azureSubscription: 'ConectionDJ'
         appType: 'webApp'
-        appName: 'Portafolio-DJ'    # Nombre de tu App Service
-        package: '$(System.ArtifactsDirectory)/drop/*.zip'
+        appName: 'Portafolio-DJ'
+        package: '$(System.ArtifactsDirectory)/drop/portafolio.zip'
