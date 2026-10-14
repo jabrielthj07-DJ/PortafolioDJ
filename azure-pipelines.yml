@@ -1,0 +1,56 @@
+
+trigger:
+  - main # Se dispara automáticamente al hacer push a la rama main
+
+pool:
+  vmImage: 'windows-2022'
+
+variables:
+  buildConfiguration: 'Release'
+
+stages:
+# 1. ETAPA DE COMPILACIÓN (CI)
+- stage: Build
+  displayName: 'Compilación y Publicación'
+  jobs:
+  - job: BuildJob
+    steps:
+    - task: ArchiveFiles@2
+      displayName: 'Empaquetar portafolio HTML y CSS'
+      inputs:
+        rootFolderOrFile: '$(Build.SourcesDirectory)'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/portafolio.zip'
+        replaceExistingArchive: true
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publicar artefactos'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+
+# 2. ETAPA DE DESPLIEGUE (CD)
+- stage: Deploy
+  displayName: 'Despliegue a Azure App Service'
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+  - job: DeployJob
+    steps:
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Descargar artefactos'
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'drop'
+        downloadPath: '$(System.ArtifactsDirectory)'
+
+    - task: AzureWebApp@1
+      displayName: 'Desplegar portafolio'
+      inputs:
+        azureSubscription: 'ConectionDJ'
+        appType: 'webApp'
+        appName: 'Portafolio-DJ'
+        package: '$(System.ArtifactsDirectory)/drop/portafolio.zip'
