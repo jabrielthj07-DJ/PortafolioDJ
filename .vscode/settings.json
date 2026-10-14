@@ -1,0 +1,5 @@
+{
+    "appService.showBuildDuringDeployPrompt": false,
+    "appService.defaultWebAppToDeploy": "/subscriptions/d2c4a8e6-1d8b-4c9d-81ee-9f2631af43c3/resourceGroups/Portafilio_dj/providers/Microsoft.Web/sites/Portafolio-DJ",
+    "appService.deploySubpath": "."
+}
