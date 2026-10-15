@@ -51,6 +51,7 @@ stages:
       displayName: 'Desplegar portafolio'
       inputs:
         azureSubscription: 'ConectionDJ'
-        appType: 'webApp'
+        appType: 'webAppLinux'
         appName: 'Portafolio-DJ'
         package: '$(System.ArtifactsDirectory)/drop/portafolio.zip'
+        deploymentMethod: 'zipDeploy'
