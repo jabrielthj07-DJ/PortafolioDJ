@@ -1,5 +1,5 @@
 trigger:
-  - master # Se dispara automáticamente al hacer push a la rama master
+  - main # Se dispara automáticamente al hacer push a la rama master
  
 pool:
   vmImage: 'windows-2022'
@@ -20,7 +20,7 @@ stages:
         SourceFolder: '$(Build.SourcesDirectory)'
         Contents: |
           index.html
-          portafolio.css
+          style.css
           aseet/**
         TargetFolder: '$(Build.ArtifactStagingDirectory)/site'
  
@@ -64,4 +64,3 @@ stages:
         appName: 'Portafolio-DJ'
         package: '$(System.ArtifactsDirectory)/drop/portafolio.zip'
         deploymentMethod: 'zipDeploy'
-
