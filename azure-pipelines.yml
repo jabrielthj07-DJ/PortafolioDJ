@@ -22,7 +22,7 @@ stages:
           index.html
           style.css
           DJ_2_Logo-removebg-preview.png
-          Adopta.jpg
+          Adopta.png
           screenduplicated.jpg
           agronative.jpg
         TargetFolder: '$(Build.ArtifactStagingDirectory)/site'
