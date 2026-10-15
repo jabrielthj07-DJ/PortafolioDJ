@@ -21,7 +21,10 @@ stages:
         Contents: |
           index.html
           style.css
-          aseet/**
+          DJ_2_Logo-removebg-preview.png
+          Adopta.jpg
+          screenduplicated.jpg
+          agronative.jpg
         TargetFolder: '$(Build.ArtifactStagingDirectory)/site'
  
     - task: ArchiveFiles@2
